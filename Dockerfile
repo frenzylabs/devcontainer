@@ -4,7 +4,7 @@
 #-------------------------------------------------------------------------------------------------------------
 
 # You can use any Debian/Ubuntu based image as a base
-FROM debian:stable-slim
+FROM debian:10.4-slim
 
 # Avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
@@ -71,13 +71,14 @@ RUN apt-get update \
     # && apt-get clean -y \
     # && rm -rf /var/lib/apt/lists/*
 
-RUN apt install -y build-essential direnv zsh 
+RUN apt install -y build-essential direnv zsh vim
 
 RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" \
     && echo 'eval "$(direnv hook zsh)"' >> "/root/.zshrc"
 
 RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
     && echo $SNIPPET >> "/root/.zshrc"
+
 
 ARG DOCTL_VERSION=1.43.0
 RUN curl -sL https://github.com/digitalocean/doctl/releases/download/v${DOCTL_VERSION}/doctl-${DOCTL_VERSION}-linux-amd64.tar.gz | tar -xzv \
@@ -91,8 +92,24 @@ RUN curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/sk
 RUN sudo install skaffold /usr/local/bin/
 
 # RUN snap install snapd
+ARG VELERO_VERSION=v1.3.2
+ARG VELERO_NAME=velero-${VELERO_VERSION}-linux-amd64
+RUN curl -sL https://github.com/vmware-tanzu/velero/releases/download/${VELERO_VERSION}/${VELERO_NAME}.tar.gz | tar -xzv \
+      && mv ${VELERO_NAME}/velero /usr/local/bin \
+      && rm -rf ${VELERO_NAME}
+
+
+RUN apt install -y unzip
+RUN curl -Lo awscliv2.zip https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip \
+    && unzip awscliv2.zip \
+    && sudo ./aws/install
+
+ARG CURRENT_SAML_VERSION=2.26.1
+RUN CURRENT_SAML_VERSION=${CURRENT_SAML_VERSION} curl -sL "https://github.com/Versent/saml2aws/releases/download/v${CURRENT_SAML_VERSION}/saml2aws_${CURRENT_SAML_VERSION}_linux_amd64.tar.gz" | tar -xzv \
+    && mv saml2aws /usr/local/bin
 
 RUN git clone https://github.com/asdf-vm/asdf.git ~/.asdf
+RUN sed -i "/^plugins=(/ s/\([^)]*\)/\1 asdf/" /root/.zshrc
 
 
 ARG DOCKER_COMPOSE_VERSION=1.23.1
