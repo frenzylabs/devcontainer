@@ -1,25 +1,19 @@
 // For format details, see https://aka.ms/vscode-remote/devcontainer.json or this file's README at:
-// https://github.com/microsoft/vscode-dev-containers/tree/v0.117.1/containers/kubernetes-helm
+
 {
-	"name": "Frenzylabs",
+	"name": "FLDevContainer",
 	// "dockerFile": "Dockerfile",
-	"dockerComposeFile": "../docker-compose.yml",
-	"service": "frenzylabs",
+	"dockerComposeFile": "./docker-compose.yml",
+	"service": "basecontainer",
 	// "shutdownAction": "none",
 
-	"workspaceFolder": "/frenzylabs",
+	"workspaceFolder": "/devcontainer",
 	"localWorkspaceFolder": "../",
 
-	"mounts": [
-		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
-		"source=${env:HOME}${env:USERPROFILE}/.kube,target=/root/.kube,type=bind",
-		"source=${env:HOME}${env:USERPROFILE}/.ssh,target=/root/.ssh,type=bind",
-		"source=${env:HOME}${env:USERPROFILE}/.gnupg,target=/root/.gnupg,type=bind",
-		"source=${localWorkspaceFolder},target=/frenzylabs,type=bind",
-		"source=frenzylabs-bashhistory,target=/commandhistory,type=volume"
-		// Uncomment the next line to also sync certs in your .minikube folder
-		// "source=${env:HOME}${env:USERPROFILE}/.minikube,target=/root/.minikube-localhost,type=bind"
-	],
+	// "mounts": [
+	// 	"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
+	// 	"source=${env:HOME}${env:USERPROFILE}/.kube,target=/root/.kube,type=bind",
+	// ],
 
 	// Set *default* container specific settings.json values on container create.
 	"settings": { 
@@ -44,13 +38,11 @@
 
 	// "containerEnv": {
 	// 	"MY_CONTAINER_VAR": "some-value-here",
-	// 	"DIGITALOCEAN_ACCESS_TOKEN": "${env:DIGITALOCEAN_ACCESS_TOKEN}"
 	// },
 
 
 	"remoteEnv": {
-		"SYNC_LOCALHOST_KUBECONFIG": "true",
-		"MY_REMOTE_TEST1": "${containerEnv:DIGITALOCEAN_ACCESS_TOKEN}"
+		"SYNC_LOCALHOST_KUBECONFIG": "true"
 	}
 
 	// Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.

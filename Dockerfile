@@ -91,7 +91,7 @@ RUN curl -sSL -o /usr/local/bin/sops https://github.com/mozilla/sops/releases/do
 RUN curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
 RUN sudo install skaffold /usr/local/bin/
 
-# RUN snap install snapd
+
 ARG VELERO_VERSION=v1.3.2
 ARG VELERO_NAME=velero-${VELERO_VERSION}-linux-amd64
 RUN curl -sL https://github.com/vmware-tanzu/velero/releases/download/${VELERO_VERSION}/${VELERO_NAME}.tar.gz | tar -xzv \

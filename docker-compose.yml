@@ -6,7 +6,11 @@ services:
       context: ./
       dockerfile: Dockerfile
     image: "frenzylab/devcontainer:latest"
-    volumes:
-      # Mount the root folder that contains .git
-      - ../:/frenzylabs:cached
-    command: /bin/sh -c "while sleep 1000; do :; done"
+
+  node:
+    container_name: node-devcontainer
+    build:
+      context: ./environments/node/
+      dockerfile: Dockerfile
+    image: "frenzylab/node-devcontainer:latest"
+
