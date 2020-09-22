@@ -112,7 +112,7 @@ RUN git clone https://github.com/asdf-vm/asdf.git ~/.asdf
 RUN sed -i "/^plugins=(/ s/\([^)]*\)/\1 asdf/" /root/.zshrc
 
 
-ARG DOCKER_COMPOSE_VERSION=1.23.1
+ARG DOCKER_COMPOSE_VERSION=1.27.1
 RUN sudo curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose \
     && chmod +x /usr/local/bin/docker-compose
 # Switch back to dialog for any ad-hoc use of apt-get
