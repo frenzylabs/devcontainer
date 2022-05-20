@@ -4,7 +4,7 @@
 #-------------------------------------------------------------------------------------------------------------
 
 # You can use any Debian/Ubuntu based image as a base
-FROM debian:10.4-slim
+FROM debian:11.3-slim
 
 # Avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
@@ -41,7 +41,7 @@ RUN apt-get update \
     # Copy localhost's ~/.kube/config file into the container and swap out localhost
     # for host.docker.internal whenever a new shell starts to keep them in sync.
     && echo '\n\
-        if [ "$SYNC_LOCALHOST_KUBECONFIG" == "true" ]; then\n\
+        if [[ "$SYNC_LOCALHOST_KUBECONFIG" == "true" ]]; then\n\
             mkdir -p $HOME/.kube\n\
             cp -r $HOME/.kube-localhost/* $HOME/.kube\n\
             sed -i -e "s/localhost/host.docker.internal/g" $HOME/.kube/config\n\
@@ -112,7 +112,7 @@ RUN git clone https://github.com/asdf-vm/asdf.git ~/.asdf
 RUN sed -i "/^plugins=(/ s/\([^)]*\)/\1 asdf/" /root/.zshrc
 
 
-ARG DOCKER_COMPOSE_VERSION=1.27.1
+ARG DOCKER_COMPOSE_VERSION=2.5.1
 RUN sudo curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose \
     && chmod +x /usr/local/bin/docker-compose
 # Switch back to dialog for any ad-hoc use of apt-get

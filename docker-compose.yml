@@ -5,7 +5,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-    image: "frenzylab/devcontainer:latest"
+    image: "frenzylab/devcontainer:bullseye"
 
   node:
     container_name: node-devcontainer
