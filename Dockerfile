@@ -17,23 +17,29 @@ ARG USERNAME=vscode
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
+RUN apt-get update && apt-get install -y ca-certificates curl && \
+    install -m 0755 -d /etc/apt/keyrings && \
+    curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc && \
+    chmod a+r /etc/apt/keyrings/docker.asc && \
+    # Add the repository to Apt sources:
+    echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
+    $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+    tee /etc/apt/sources.list.d/docker.list > /dev/null  && \
+    apt-get update \
+    && apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+
 # Configure apt and install packages
 RUN apt-get update \
     && apt-get -y install --no-install-recommends apt-utils dialog 2>&1 \
-    #
     # Verify git, process tools installed
     && apt-get -y install git openssh-client less iproute2 procps \
-    #
-    # Install Docker CE CLI
-    && apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common lsb-release \
-    && curl -fsSL https://download.docker.com/linux/$(lsb_release -is | tr '[:upper:]' '[:lower:]')/gpg | (OUT=$(apt-key add - 2>&1) || echo $OUT) \
-    && add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/$(lsb_release -is | tr '[:upper:]' '[:lower:]') $(lsb_release -cs) stable" \
-    && apt-get update \
-    && apt-get install -y docker-ce-cli \
-    #
     # Install kubectl
     && curl -sSL -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
-    && chmod +x /usr/local/bin/kubectl \
+    && chmod +x /usr/local/bin/kubectl
+
+RUN apt-get update \
     #
     # Install Helm
     && curl -s https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash - \
@@ -71,42 +77,13 @@ RUN apt-get update \
     # && apt-get clean -y \
     # && rm -rf /var/lib/apt/lists/*
 
-RUN apt install -y build-essential direnv zsh vim
+RUN apt install -y build-essential direnv zsh vim unzip
 
 RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" \
     && echo 'eval "$(direnv hook zsh)"' >> "/root/.zshrc"
 
 RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
     && echo $SNIPPET >> "/root/.zshrc"
-
-
-ARG DOCTL_VERSION=1.43.0
-RUN curl -sL https://github.com/digitalocean/doctl/releases/download/v${DOCTL_VERSION}/doctl-${DOCTL_VERSION}-linux-amd64.tar.gz | tar -xzv \
-    && mv doctl /usr/local/bin
-
-RUN helm plugin install https://github.com/futuresimple/helm-secrets 
-
-RUN curl -sSL -o /usr/local/bin/sops https://github.com/mozilla/sops/releases/download/v3.5.0/sops-v3.5.0.linux 
-
-RUN curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
-RUN sudo install skaffold /usr/local/bin/
-
-
-ARG VELERO_VERSION=v1.3.2
-ARG VELERO_NAME=velero-${VELERO_VERSION}-linux-amd64
-RUN curl -sL https://github.com/vmware-tanzu/velero/releases/download/${VELERO_VERSION}/${VELERO_NAME}.tar.gz | tar -xzv \
-      && mv ${VELERO_NAME}/velero /usr/local/bin \
-      && rm -rf ${VELERO_NAME}
-
-
-RUN apt install -y unzip
-RUN curl -Lo awscliv2.zip https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip \
-    && unzip awscliv2.zip \
-    && sudo ./aws/install
-
-ARG CURRENT_SAML_VERSION=2.26.1
-RUN CURRENT_SAML_VERSION=${CURRENT_SAML_VERSION} curl -sL "https://github.com/Versent/saml2aws/releases/download/v${CURRENT_SAML_VERSION}/saml2aws_${CURRENT_SAML_VERSION}_linux_amd64.tar.gz" | tar -xzv \
-    && mv saml2aws /usr/local/bin
 
 RUN git clone https://github.com/asdf-vm/asdf.git ~/.asdf
 RUN sed -i "/^plugins=(/ s/\([^)]*\)/\1 asdf/" /root/.zshrc
